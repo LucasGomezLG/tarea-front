@@ -12,6 +12,7 @@ function App() {
     <BrowserRouter>
       <Switch>
         <Route exact path="/" render={(props) => <Home {...props} />} />
+        <Route exact path="/tareas" render={(props) => <Home {...props} />} />
       </Switch>
     </BrowserRouter>
 
