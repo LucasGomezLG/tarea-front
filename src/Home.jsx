@@ -3,14 +3,6 @@ import logo from './logo.svg';
 import './App.css';
 import Swal from 'sweetalert2';
 import API from './service/api.js';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch
-} from "react-router-dom";
-
 
 class Home extends React.Component {
   constructor(props) {
@@ -31,7 +23,8 @@ class Home extends React.Component {
 
   colorPrioridad(valor) {
 
-    if (valor === "alto") {
+    if (valor === "Alta") {
+
 
       return (
 
@@ -39,12 +32,20 @@ class Home extends React.Component {
 
       )
 
+    } else if (valor === "Media") {
 
-    } else {
       return (
-        <span class="badge badge-secondary">{valor}</span>
+        <span class="badge badge-secondary medioColor">{valor}</span>
       )
+
+    } else if (valor === "Baja"){
+
+      return (
+        <span class="badge badge-secondary bajaColor">{valor}</span>
+      )
+
     }
+
 
   }
 
@@ -74,7 +75,7 @@ class Home extends React.Component {
   }
 
   crearTareaNueva(valores) {
-    API.post('/addtarea', { nombre: valores[0], descripcion: valores[1], prioridad: valores[2] })
+    API.post('/addtarea', { nombre: valores[1], descripcion: valores[2], prioridad: valores[0] })
       .then(() => this.componentDidMount())
       .catch((error) => console.log(error))
   }
@@ -90,19 +91,51 @@ class Home extends React.Component {
         progressSteps: ['1', '2', '3']
       }).queue([
         {
-          title: 'Agregar nombre',
-          text: ''
+          title: 'Agregar prioridad de la tarea',
+          text: '',
+          input: 'radio',
+          inputOptions: {
+            'Alta': 'Alta',
+            'Media' : 'Media',
+            'Baja': 'Baja'
+          },
+          inputValidator: (input) => {
+            if (!input) {
+              return 'Necesitas elegir una prioridad!'
+            }
+          }
+        },{
+
+          title:'Nombre de la tarea',
+          text:'',
+          inputValidator: (text) => {
+            if (!text) {
+              return 'Necesitas agregar nombre a la tarea!'
+            }
+          }
+
         },
-        'Agregar descripcion',
-        'Agregar prioridad'
+        {
+          title:'Descripcion de la tarea',
+          text:'',
+          inputValidator: (text) => {
+            if (!text) {
+              return 'Necesitas agregar nombre a la tarea!'
+            }
+          }
+
+        }
+        
+
       ]).then((result) => {
         if (result.value) {
           this.crearTareaNueva(result.value);
           Swal.fire({
             title: 'Tarea lista!',
-            html: ` nombre: ${result.value[0]}<br />
-            desc: ${result.value[1]} <br />
-            prioridad: ${result.value[2]}<br />
+            html: ` prioridad: ${result.value[0]}<br />
+            nombre: ${result.value[1]}<br />
+            desc: ${result.value[2]} <br />
+            
             `,
             confirmButtonText: 'Listorti!'
           })
