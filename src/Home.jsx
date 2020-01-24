@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import Swal from 'sweetalert2';
 import API from './service/api.js';
+import LogoutIcon from './icons/exit.png';
+
 
 class Home extends React.Component {
   constructor(props) {
@@ -11,13 +13,18 @@ class Home extends React.Component {
     this.state = {
       tareas: [],
       tareasFiltradas: [],
+      user: '',
     }
   }
+
 
   componentDidMount() {
 
     API.get('/tareas').then((res) => this.setState({ tareas: res }))
       .catch((error) => console.log(error));
+  
+      this.setState({user: this.props.location.state.username});
+      console.log(this.props.location.state)
 
   }
 
@@ -28,26 +35,27 @@ class Home extends React.Component {
 
       return (
 
-        <span class="badge badge-secondary altoColor">{valor}</span>
+        <span className="badge badge-secondary altoColor">{valor}</span>
 
       )
 
     } else if (valor === "Media") {
 
       return (
-        <span class="badge badge-secondary medioColor">{valor}</span>
+        <span className="badge badge-secondary medioColor">{valor}</span>
       )
 
-    } else if (valor === "Baja"){
+    } else if (valor === "Baja") {
 
       return (
-        <span class="badge badge-secondary bajaColor">{valor}</span>
+        <span className="badge badge-secondary bajaColor">{valor}</span>
       )
 
     }
 
 
   }
+
 
   transformarTareas(tarea) {
 
@@ -59,7 +67,8 @@ class Home extends React.Component {
               {this.colorPrioridad(tarea.prioridad)}
               <h5 className="card-title">{tarea.nombre}</h5>
               <p className="card-text">{tarea.descripcion}</p>
-              <button className="btn btn-primary" onClick={() => { this.borrarTarea(tarea.id) }} >Eliminar</button>
+              <button className="btn btn-outline-info butonAct" >Ver actividades</button>
+              <button className="btn btn-danger" onClick={() => { this.borrarTarea(tarea.id) }} >Eliminar</button>
             </div>
           </div>
         </div>
@@ -70,7 +79,26 @@ class Home extends React.Component {
 
   borrarTarea(id) {
 
-    API.delete(`/tarea/${id}`).then((res) => this.componentDidMount()).catch((error) => console.log(error))
+    Swal.fire({
+      title: '¿Seguro quieres eliminar la tarea?',
+      text: "",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si'
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire(
+          '!Tarea eliminada!',
+          '',
+          'success'
+        )
+        API.delete(`/tarea/${id}`).then((res) => this.componentDidMount()).catch((error) => console.log(error))
+      }
+    })
+
+
 
   }
 
@@ -96,7 +124,7 @@ class Home extends React.Component {
           input: 'radio',
           inputOptions: {
             'Alta': 'Alta',
-            'Media' : 'Media',
+            'Media': 'Media',
             'Baja': 'Baja'
           },
           inputValidator: (input) => {
@@ -104,10 +132,10 @@ class Home extends React.Component {
               return 'Necesitas elegir una prioridad!'
             }
           }
-        },{
+        }, {
 
-          title:'Nombre de la tarea',
-          text:'',
+          title: 'Nombre de la tarea',
+          text: '',
           inputValidator: (text) => {
             if (!text) {
               return 'Necesitas agregar nombre a la tarea!'
@@ -116,8 +144,8 @@ class Home extends React.Component {
 
         },
         {
-          title:'Descripcion de la tarea',
-          text:'',
+          title: 'Descripcion de la tarea',
+          text: '',
           inputValidator: (text) => {
             if (!text) {
               return 'Necesitas agregar nombre a la tarea!'
@@ -125,7 +153,7 @@ class Home extends React.Component {
           }
 
         }
-        
+
 
       ]).then((result) => {
         if (result.value) {
@@ -195,14 +223,41 @@ class Home extends React.Component {
 
   }
 
+
+  mostrarUsuario() {
+
+    return (
+
+      <div>
+        <h3>{this.state.user}</h3>
+      </div>
+    )
+  }
+
+  exit(){
+
+    this.props.history.push({
+
+      pathname: '/',
+
+    })
+
+  }
+
   render() {
     return (
 
       <div className="container App">
         <div className="row">
           <div className="App-header" >
+
+
             <div className="col">
-              <img src={logo} className="App-logo" alt="logo" />
+              <div>
+                {this.mostrarUsuario()}
+              <img className ="cursorExit" src={LogoutIcon} alt="" onClick={() => this.exit()} />
+              </div>
+              <img src={logo} className="App-logo " alt="exit"  />
               <p>Tareas</p>
 
               <input type="text" placeholder="Buscar tarea..." onChange={(e) => this.buscador(e)}></input>
