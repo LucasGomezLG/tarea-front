@@ -66,7 +66,7 @@ class Login extends React.Component {
             <div className="formLog">
                 <div className="input-group form-group">
                     <span className="input-group-addon"><i className="glyphicon glyphicon-user"></i></span>
-                    <input type="text" className="form-control" placeholder="Email" onChange={(e) => this.emailLog(e)} />
+                    <input type="email" className="form-control" placeholder="Email" onChange={(e) => this.emailLog(e)} />
                 </div>
                 <div className="input-group form-group formLog1">
                     <span className="input-group-addon"><i className="glyphicon glyphicon-lock"></i></span>
@@ -96,7 +96,7 @@ class Login extends React.Component {
                         <div className="col">
 
                             <img src={logo} className="App-logo" alt="logo" />
-                            <p>Tareas</p>
+                            <p>Registrarse</p>
 
 
                         </div>

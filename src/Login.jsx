@@ -90,7 +90,7 @@ class Login extends React.Component {
                     <div className="App-header" >
                         <div className="col">
                             <img src={logo} className="App-logo" alt="logo" />
-                            <p>Tareas</p>
+                            <p>Login</p>
                         </div>
                     </div>
                     <div className="col">

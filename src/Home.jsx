@@ -13,18 +13,28 @@ class Home extends React.Component {
     this.state = {
       tareas: [],
       tareasFiltradas: [],
-      user: '',
+      username: '',
+      user: {id: ''},
+
     }
   }
 
 
   componentDidMount() {
 
-    API.get('/tareas').then((res) => this.setState({ tareas: res }))
+    this.setState({user: this.props.location.state})
+    
+    const paramReq = {
+     id: this.props.location.state.id
+    }
+
+    API.get('/user', paramReq).then((res) => this.setState({ tareas: res.tareas }))
       .catch((error) => console.log(error));
-  
-      this.setState({user: this.props.location.state.username});
-      console.log(this.props.location.state)
+
+
+    this.setState({ username: this.props.location.state.username });
+
+    localStorage.setItem("username", this.props.location.state.username);
 
   }
 
@@ -67,7 +77,7 @@ class Home extends React.Component {
               {this.colorPrioridad(tarea.prioridad)}
               <h5 className="card-title">{tarea.nombre}</h5>
               <p className="card-text">{tarea.descripcion}</p>
-              <button className="btn btn-outline-info butonAct" >Ver actividades</button>
+              <button className="btn btn-outline-info butonAct" onClick={() => { this.goToActividades(tarea.id) }} >Ver actividades</button>
               <button className="btn btn-danger" onClick={() => { this.borrarTarea(tarea.id) }} >Eliminar</button>
             </div>
           </div>
@@ -76,6 +86,24 @@ class Home extends React.Component {
 
     );
   }
+
+  goToActividades(id) {
+
+    this.props.history.push({
+
+      pathname: '/actividades',
+      state: {
+        idTarea: id,
+        username: this.state.username
+      },
+      
+
+    });
+
+  }
+
+  
+
 
   borrarTarea(id) {
 
@@ -94,16 +122,14 @@ class Home extends React.Component {
           '',
           'success'
         )
-        API.delete(`/tarea/${id}`).then((res) => this.componentDidMount()).catch((error) => console.log(error))
+        API.delete(`/tarea/${id}`).then((res) => this.componentDidMount()).catch((error) => console.log(error));
       }
     })
-
-
 
   }
 
   crearTareaNueva(valores) {
-    API.post('/addtarea', { nombre: valores[1], descripcion: valores[2], prioridad: valores[0] })
+    API.post('/addtarea', { idUsuario: this.state.user.id,nombre: valores[1], descripcion: valores[2], prioridad: valores[0] })
       .then(() => this.componentDidMount())
       .catch((error) => console.log(error))
   }
@@ -116,7 +142,7 @@ class Home extends React.Component {
         input: 'text',
         confirmButtonText: 'Next &rarr;',
         showCancelButton: true,
-        progressSteps: ['1', '2', '3']
+        progressSteps: ['1', '2', '3', '4']
       }).queue([
         {
           title: 'Agregar prioridad de la tarea',
@@ -148,10 +174,18 @@ class Home extends React.Component {
           text: '',
           inputValidator: (text) => {
             if (!text) {
+              return 'Necesitas agregar una descripcion a la tarea!'
+            }
+          }
+        },
+        {
+          title: 'Actividades',
+          text:'',
+          inputValidator: (text) => {
+            if (!text) {
               return 'Necesitas agregar nombre a la tarea!'
             }
           }
-
         }
 
 
@@ -218,7 +252,7 @@ class Home extends React.Component {
 
   buscador(e) {
 
-    this.setState({ tareasFiltradas: this.state.tareas.filter((tarea) => tarea.nombre.includes(e.target.value)) });
+    this.setState({ tareasFiltradas: this.state.tareas.filter((tarea) => tarea.nombre.toLowerCase().includes(e.target.value.toLowerCase())) });
 
 
   }
@@ -229,12 +263,12 @@ class Home extends React.Component {
     return (
 
       <div>
-        <h3>{this.state.user}</h3>
+        <h3>{this.state.username}</h3>
       </div>
     )
   }
 
-  exit(){
+  exit() {
 
     this.props.history.push({
 
@@ -255,9 +289,9 @@ class Home extends React.Component {
             <div className="col">
               <div>
                 {this.mostrarUsuario()}
-              <img className ="cursorExit" src={LogoutIcon} alt="" onClick={() => this.exit()} />
+                <img className="cursorExit" src={LogoutIcon} alt="" onClick={() => this.exit()} />
               </div>
-              <img src={logo} className="App-logo " alt="exit"  />
+              <img src={logo} className="App-logo " alt="exit" />
               <p>Tareas</p>
 
               <input type="text" placeholder="Buscar tarea..." onChange={(e) => this.buscador(e)}></input>
