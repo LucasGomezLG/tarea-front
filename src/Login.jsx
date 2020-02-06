@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import API from './service/api';
+import Swal from 'sweetalert2';
 
 class Login extends React.Component {
     constructor(props) {
@@ -42,19 +43,35 @@ class Login extends React.Component {
 
 
     iniciarSesion() {
-
         const body = this.state;
         API.post('/login', body).then((res) => this.goToHome(res))
-            .catch((e) => console.log(e))
+            .catch((e) => this.showLoginError(e))
 
+    }
+
+    showLoginError(e){
+        if (e.response.status >= 400 ){
+            Swal.fire({
+                id: '400-login',
+                icon: 'error',
+                title: 'Email y password incorrectos',
+                text: e.response.status,
+              })
+        } else {
+            Swal.fire({
+                id: 'other-error-login',
+                icon: 'error',
+                title: 'Servidor no responde u error desconocido',
+                text: e.response.status,
+              })
+        }
+        
     }
 
     registrarse() {
 
         this.props.history.push({
-
             pathname: '/registrarse'
-
         });
 
     }
@@ -66,16 +83,14 @@ class Login extends React.Component {
             <div className="formLog">
                 <div className="input-group form-group">
                     <span className="input-group-addon"><i className="glyphicon glyphicon-user"></i></span>
-                    <input type="text" className="form-control" placeholder="Email" onChange={(e) => this.emailLog(e)} />
+                    <input id="email" type="text" className="form-control" placeholder="Email" onChange={(e) => this.emailLog(e)} />
                 </div>
                 <div className="input-group form-group formLog1">
                     <span className="input-group-addon"><i className="glyphicon glyphicon-lock"></i></span>
-                    <input type="password" className="form-control" placeholder="Password" onChange={(e) => this.passLog(e)} />
+                    <input id="password" type="password" className="form-control" placeholder="Password" onChange={(e) => this.passLog(e)} />
                 </div>
-                <button type="submit" className="boton btn btn-primary buttonSes"
+                <button id="loginButton" type="submit" className="boton btn btn-primary buttonSes"
                     onClick={() => this.iniciarSesion()}> Iniciar sesion </button>
-
-
             </div>
 
         )
