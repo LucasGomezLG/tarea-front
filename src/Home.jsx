@@ -286,7 +286,7 @@ class Home extends React.Component {
           <div className="App-header" >
 
 
-            <div className="col">
+            <div id="tareas-col-home" className="col">
               <div>
                 {this.mostrarUsuario()}
                 <img className="cursorExit" src={LogoutIcon} alt="" onClick={() => this.exit()} />
